@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>College Events</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+
+    <h1>College Event Management System</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="register.html">Register</a>
+        <a href="host.html">Host</a>
+    </nav>
+
+</header>
+
+
+<section class="events">
+
+    <h2>Upcoming Events</h2>
+
+    <div id="eventContainer" class="event-container">
+
+    </div>
+
+</section>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBCd9jgelyscNH8uht8s8nFsRfXkvK-eIbg",
+
+    authDomain: "college-event-managment-b5d1b.firebaseapp.com",
+
+    projectId: "college-event-managment-b5d1b",
+
+    storageBucket: "college-event-managment-b5d1b.firebasestorage.app",
+
+    messagingSenderId: "627227280897",
+
+    appId: "1:627227280897:web:83f5c219c297188676e200"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+const eventContainer =
+    document.getElementById("eventContainer");
+
+
+async function loadEvents() {
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "events"));
+
+
+        if (snapshot.empty) {
+
+            eventContainer.innerHTML =
+                "<p>No events available.</p>";
+
+            return;
+
+        }
+
+
+        snapshot.forEach((eventDoc) => {
+
+            const event = eventDoc.data();
+
+
+            const eventCard =
+                document.createElement("div");
+
+            eventCard.className = "event-card";
+
+
+            eventCard.innerHTML = `
+
+                <h3>${event.name}</h3>
+
+                <p>
+                    <b>Date:</b> ${event.date}
+                </p>
+
+                <p>
+                    <b>Venue:</b> ${event.venue}
+                </p>
+
+                <a href="register.html">
+                    <button>Register Now</button>
+                </a>
+
+            `;
+
+
+            eventContainer.appendChild(eventCard);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        eventContainer.innerHTML =
+            "<p>Unable to load events.</p>";
+
+    }
+
+}
+
+
+loadEvents();
+
+</script>
+
+</body>
+
+</html>
