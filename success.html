@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registration Successful</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>College Event Management System</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="register.html">Register</a>
+        <a href="host-login.html">Host Login</a>
+    </nav>
+</header>
+
+
+<section class="registration">
+
+    <h2>🎉 Registration Successful!</h2>
+
+    <p>Your event registration has been submitted.</p>
+
+    <p>
+        <b>Student Name:</b>
+        <span id="studentName"></span>
+    </p>
+
+    <p>
+        <b>Roll Number:</b>
+        <span id="rollNumber"></span>
+    </p>
+
+    <p>
+        <b>Event:</b>
+        <span id="eventName"></span>
+    </p>
+
+    <p>
+        <b>Transaction ID:</b>
+        <span id="transactionId"></span>
+    </p>
+
+    <p>
+        <b>Payment Status:</b>
+        <span>Pending Verification ⏳</span>
+    </p>
+
+    <br>
+
+    <a href="index.html">
+        <button>Back to Home</button>
+    </a>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 College Event Management System</p>
+
+</footer>
+
+
+<script>
+
+document.getElementById("studentName").innerText =
+    sessionStorage.getItem("studentName");
+
+document.getElementById("rollNumber").innerText =
+    sessionStorage.getItem("rollNumber");
+
+document.getElementById("eventName").innerText =
+    sessionStorage.getItem("selectedEvent");
+
+document.getElementById("transactionId").innerText =
+    sessionStorage.getItem("transactionId");
+
+</script>
+
+</body>
+
+</html>
