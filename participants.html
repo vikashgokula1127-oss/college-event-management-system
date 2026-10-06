@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Participants</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>College Event Management System</h1>
+</header>
+
+<section class="events">
+
+    <h2>Registered Participants</h2>
+
+    <div id="participantsContainer">
+        <p>Loading participants...</p>
+    </div>
+
+    <br>
+
+    <a href="host-dashboard.html">
+        <button>Back to Dashboard</button>
+    </a>
+
+</section>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBCd9jgelyscNH8uht8s8nFsRfXkvK-eIbg",
+
+    authDomain: "college-event-managment-b5d1b.firebaseapp.com",
+
+    projectId: "college-event-managment-b5d1b",
+
+    storageBucket: "college-event-managment-b5d1b.firebasestorage.app",
+
+    messagingSenderId: "627227280897",
+
+    appId: "1:627227280897:web:83f5c219c297188676e200"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+const participantsContainer =
+    document.getElementById("participantsContainer");
+
+
+async function loadParticipants() {
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "registrations"));
+
+
+        participantsContainer.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            participantsContainer.innerHTML =
+                "<p>No participants registered yet.</p>";
+
+            return;
+
+        }
+
+
+        snapshot.forEach((participantDoc) => {
+
+            const participant =
+                participantDoc.data();
+
+
+            const participantCard =
+                document.createElement("div");
+
+            participantCard.className =
+                "event-card";
+
+
+            participantCard.innerHTML = `
+    <h3>${participant.name || "No Name"}</h3>
+
+    <p><b>Roll Number:</b> ${participant.rollNumber || "No Roll Number"}</p>
+
+    <p><b>Email:</b> ${participant.email || "No Email"}</p>
+
+    <p><b>Phone:</b> ${participant.phone || "No Phone"}</p>
+
+    <p><b>Department:</b> ${participant.department || "No Department"}</p>
+
+    <p><b>Event:</b> ${participant.event || "No Event"}</p>
+`;
+
+            participantsContainer.appendChild(
+                participantCard
+            );
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading participants:",
+            error
+        );
+
+        participantsContainer.innerHTML =
+            "<p>Unable to load participants.</p>";
+
+    }
+
+}
+
+
+loadParticipants();
+
+</script>
+
+</body>
+
+</html>
