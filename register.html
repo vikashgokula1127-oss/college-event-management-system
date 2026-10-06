@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Event Registration</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>College Event Management System</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="register.html">Register</a>
+        <a href="host-login.html">Host Login</a>
+    </nav>
+</header>
+
+
+<section class="registration">
+
+    <h2>Student Event Registration</h2>
+
+    <form id="registrationForm">
+
+        <!-- Student Name -->
+        <label>Student Name</label>
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Enter your name"
+            required
+        >
+
+
+        <!-- Roll Number -->
+        <label>Roll Number</label>
+
+        <input
+            type="text"
+            id="rollNumber"
+            placeholder="Enter your roll number"
+            required
+        >
+
+
+        <!-- Email -->
+        <label>Email</label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+        >
+
+
+        <!-- Phone Number -->
+        <label>Phone Number</label>
+
+        <input
+            type="tel"
+            id="phone"
+            placeholder="Enter phone number"
+            required
+        >
+
+
+        <!-- Department -->
+        <label>College / Department</label>
+
+        <input
+            type="text"
+            id="department"
+            placeholder="Enter department"
+            required
+        >
+
+
+        <!-- Event -->
+        <label>Select Event</label>
+
+        <select id="event" required>
+
+            <option value="">
+                -- Select Event --
+            </option>
+
+        </select>
+
+
+        <!-- Next Button -->
+        <button type="submit">
+            Next →
+        </button>
+
+    </form>
+
+
+    <p id="registrationMessage"></p>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 College Event Management System</p>
+
+</footer>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    addDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// Firebase configuration
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBCd9jgelyscNH8uht8s8nFsRfXkvK-eIbg",
+
+    authDomain: "college-event-managment-b5d1b.firebaseapp.com",
+
+    projectId: "college-event-managment-b5d1b",
+
+    storageBucket: "college-event-managment-b5d1b.firebasestorage.app",
+
+    messagingSenderId: "627227280897",
+
+    appId: "1:627227280897:web:83f5c219c297188676e200"
+
+};
+
+
+// Start Firebase
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// Get HTML elements
+
+const eventSelect =
+    document.getElementById("event");
+
+const registrationForm =
+    document.getElementById("registrationForm");
+
+const registrationMessage =
+    document.getElementById("registrationMessage");
+
+
+// LOAD EVENTS ADDED BY HOST
+
+async function loadEvents() {
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "events"));
+
+
+        // Clear old options
+
+        eventSelect.innerHTML =
+            '<option value="">-- Select Event --</option>';
+
+
+        // Add events from Firebase
+
+        snapshot.forEach((eventDoc) => {
+
+            const eventData =
+                eventDoc.data();
+
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                eventData.name;
+
+
+            option.textContent =
+                eventData.name;
+
+
+            eventSelect.appendChild(option);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading events:",
+            error
+        );
+
+        registrationMessage.innerHTML =
+            "Unable to load events ❌";
+
+        registrationMessage.style.color =
+            "red";
+
+    }
+
+}
+
+
+// Load events when page opens
+
+loadEvents();
+
+
+// STUDENT CLICKS NEXT
+
+registrationForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        // Get student information
+
+        const name =
+            document.getElementById("name").value;
+
+        const rollNumber =
+            document.getElementById("rollNumber").value;
+
+        const email =
+            document.getElementById("email").value;
+
+        const phone =
+            document.getElementById("phone").value;
+
+        const department =
+            document.getElementById("department").value;
+
+        const selectedEvent =
+            document.getElementById("event").value;
+
+
+        // Check event selection
+
+        if (selectedEvent === "") {
+
+            registrationMessage.innerHTML =
+                "Please select an event ❌";
+
+            registrationMessage.style.color =
+                "red";
+
+            return;
+
+        }
+
+
+        try {
+
+            // Save student registration
+
+            await addDoc(
+                collection(db, "registrations"),
+                {
+
+                    name: name,
+
+                    rollNumber: rollNumber,
+
+                    email: email,
+
+                    phone: phone,
+
+                    department: department,
+
+                    event: selectedEvent,
+
+                    paymentStatus: "Pending"
+
+                }
+            );
+
+
+            // Save student information temporarily
+
+            sessionStorage.setItem(
+                "studentName",
+                name
+            );
+
+            sessionStorage.setItem(
+                "rollNumber",
+                rollNumber
+            );
+
+            sessionStorage.setItem(
+                "email",
+                email
+            );
+
+            sessionStorage.setItem(
+                "phone",
+                phone
+            );
+
+            sessionStorage.setItem(
+                "department",
+                department
+            );
+
+            sessionStorage.setItem(
+                "selectedEvent",
+                selectedEvent
+            );
+
+
+            // Go to payment page
+
+            window.location.href =
+                "payment.html";
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            registrationMessage.innerHTML =
+                "Registration failed ❌";
+
+            registrationMessage.style.color =
+                "red";
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
