@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Host Login</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>College Event Management System</h1>
+</header>
+
+<section class="login">
+
+    <h2>Host Login</h2>
+
+    <form id="hostLoginForm" onsubmit="return false;">
+
+        <label>Host Email:</label>
+        <input type="email" id="hostUsername" required>
+
+        <label>Password:</label>
+        <input type="password" id="hostPassword" required>
+
+        <button type="button" id="loginButton">Login</button>
+
+    </form>
+
+    <p id="hostLoginMessage"></p>
+
+</section>
+
+<script>
+
+document.getElementById("loginButton").onclick = function() {
+
+    let email = document.getElementById("hostUsername").value;
+    let password = document.getElementById("hostPassword").value;
+
+    if (email === "necn@college.com" && password === "12345") {
+
+        document.getElementById("hostLoginMessage").innerHTML =
+            "Login Successful! ✅";
+
+        document.getElementById("hostLoginMessage").style.color = "green";
+
+        setTimeout(function() {
+            window.location.href = "host-dashboard.html";
+        }, 500);
+
+    } else {
+
+        document.getElementById("hostLoginMessage").innerHTML =
+            "Invalid Host Email or Password ❌";
+
+        document.getElementById("hostLoginMessage").style.color = "red";
+
+    }
+
+};
+
+</script>
+
+</body>
+</html>
