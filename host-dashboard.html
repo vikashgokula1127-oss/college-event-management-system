@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Host Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Host Dashboard</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="host.html">Manage Events</a>
+        <a href="participants.html">Participants</a>
+    </nav>
+</header>
+
+
+<section class="registration">
+
+    <h2>Payment Verification</h2>
+
+    <div id="paymentsList">
+        Loading payments...
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 College Event Management System</p>
+
+</footer>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBCd9jgelyscNH8uht8s8nFsRfXkvK-eIbg",
+
+    authDomain: "college-event-managment-b5d1b.firebaseapp.com",
+
+    projectId: "college-event-managment-b5d1b",
+
+    storageBucket: "college-event-managment-b5d1b.firebasestorage.app",
+
+    messagingSenderId: "627227280897",
+
+    appId: "1:627227280897:web:83f5c219c297188676e200"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+const paymentsList =
+    document.getElementById("paymentsList");
+
+
+async function loadPayments() {
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "payments"));
+
+
+        paymentsList.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            paymentsList.innerHTML =
+                "<p>No payments found.</p>";
+
+            return;
+
+        }
+
+
+        snapshot.forEach((paymentDoc) => {
+
+            const payment =
+                paymentDoc.data();
+
+
+            const div =
+                document.createElement("div");
+
+
+            div.style.border = "1px solid #ccc";
+            div.style.padding = "15px";
+            div.style.margin = "10px";
+            div.style.borderRadius = "8px";
+
+
+            div.innerHTML = `
+
+                <h3>${payment.studentName}</h3>
+
+                <p>
+                    <b>Roll Number:</b>
+                    ${payment.rollNumber}
+                </p>
+
+                <p>
+                    <b>Email:</b>
+                    ${payment.email}
+                </p>
+
+                <p>
+                    <b>Phone:</b>
+                    ${payment.phone}
+                </p>
+
+                <p>
+                    <b>Event:</b>
+                    ${payment.event}
+                </p>
+
+                <p>
+                    <b>Amount:</b>
+                    ₹${payment.amount}
+                </p>
+
+                <p>
+                    <b>Transaction ID:</b>
+                    ${payment.transactionId}
+                </p>
+
+                <p>
+                    <b>Status:</b>
+                    ${payment.paymentStatus}
+                </p>
+
+                <button class="verifyButton">
+                    Verify Payment
+                </button>
+
+            `;
+
+
+            const button =
+                div.querySelector(".verifyButton");
+
+
+            if (payment.paymentStatus === "Verified") {
+
+                button.disabled = true;
+
+                button.innerText =
+                    "Payment Verified";
+
+            }
+
+
+            button.addEventListener(
+                "click",
+                async function() {
+
+                    try {
+
+                        await updateDoc(
+                            doc(
+                                db,
+                                "payments",
+                                paymentDoc.id
+                            ),
+                            {
+                                paymentStatus: "Verified"
+                            }
+                        );
+
+
+                        button.innerText =
+                            "Payment Verified";
+
+                        button.disabled =
+                            true;
+
+                        alert(
+                            "Payment verified successfully!"
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Error verifying payment."
+                        );
+
+                    }
+
+                }
+            );
+
+
+            paymentsList.appendChild(div);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        paymentsList.innerHTML =
+            "Unable to load payments ❌";
+
+    }
+
+}
+
+
+loadPayments();
+
+</script>
+
+</body>
+
+</html>
