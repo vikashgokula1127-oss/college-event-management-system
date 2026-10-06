@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Host - Manage Events</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>College Event Management System</h1>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="register.html">Register</a>
+        <a href="host.html">Host</a>
+    </nav>
+</header>
+
+
+<section class="registration">
+
+    <h2>Add New Event</h2>
+
+    <form id="eventForm">
+
+        <label>Event Name:</label>
+        <input type="text" id="eventName" required>
+
+        <label>Date:</label>
+        <input type="date" id="eventDate" required>
+
+        <label>Venue:</label>
+        <input type="text" id="eventVenue" required>
+
+        <button type="submit">Add Event</button>
+
+    </form>
+
+    <p id="eventMessage"></p>
+
+
+    <hr>
+
+    <h2>Manage Events</h2>
+
+    <div id="hostEventContainer">
+        <p>Loading events...</p>
+    </div>
+
+</section>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBCd9jgelyscNH8uht8s8nFsRfXkvK-eIbg",
+
+    authDomain: "college-event-managment-b5d1b.firebaseapp.com",
+
+    projectId: "college-event-managment-b5d1b",
+
+    storageBucket: "college-event-managment-b5d1b.firebasestorage.app",
+
+    messagingSenderId: "627227280897",
+
+    appId: "1:627227280897:web:83f5c219c297188676e200"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+const eventForm =
+    document.getElementById("eventForm");
+
+const eventMessage =
+    document.getElementById("eventMessage");
+
+const hostEventContainer =
+    document.getElementById("hostEventContainer");
+
+
+
+/* ADD EVENT */
+
+eventForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const eventName =
+            document.getElementById("eventName").value;
+
+        const eventDate =
+            document.getElementById("eventDate").value;
+
+        const eventVenue =
+            document.getElementById("eventVenue").value;
+
+
+        try {
+
+            await addDoc(
+                collection(db, "events"),
+                {
+                    name: eventName,
+                    date: eventDate,
+                    venue: eventVenue
+                }
+            );
+
+
+            eventMessage.innerHTML =
+                "Event added successfully! ✅";
+
+            eventMessage.style.color =
+                "green";
+
+
+            eventForm.reset();
+
+
+            loadEvents();
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            eventMessage.innerHTML =
+                "Failed to add event ❌";
+
+            eventMessage.style.color =
+                "red";
+
+        }
+
+    }
+);
+
+
+
+/* SHOW EVENTS FOR HOST */
+
+async function loadEvents() {
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "events")
+            );
+
+
+        hostEventContainer.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            hostEventContainer.innerHTML =
+                "<p>No events available.</p>";
+
+            return;
+
+        }
+
+
+        snapshot.forEach((eventDoc) => {
+
+            const eventData =
+                eventDoc.data();
+
+
+            const eventCard =
+                document.createElement("div");
+
+            eventCard.className =
+                "event-card";
+
+
+            eventCard.innerHTML = `
+
+                <h3>${eventData.name}</h3>
+
+                <p>
+                    <b>Date:</b>
+                    ${eventData.date}
+                </p>
+
+                <p>
+                    <b>Venue:</b>
+                    ${eventData.venue}
+                </p>
+
+                <button
+                    class="delete-button"
+                    data-id="${eventDoc.id}">
+                    🗑️ Delete Event
+                </button>
+
+            `;
+
+
+            hostEventContainer.appendChild(
+                eventCard
+            );
+
+
+            const deleteButton =
+                eventCard.querySelector(
+                    ".delete-button"
+                );
+
+
+            deleteButton.addEventListener(
+                "click",
+                async function() {
+
+                    const confirmDelete =
+                        confirm(
+                            "Are you sure you want to delete this event?"
+                        );
+
+
+                    if (!confirmDelete) {
+                        return;
+                    }
+
+
+                    try {
+
+                        await deleteDoc(
+                            doc(
+                                db,
+                                "events",
+                                eventDoc.id
+                            )
+                        );
+
+
+                        eventCard.remove();
+
+
+                        alert(
+                            "Event deleted successfully! ✅"
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Failed to delete event ❌"
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        hostEventContainer.innerHTML =
+            "<p>Unable to load events.</p>";
+
+    }
+
+}
+
+
+loadEvents();
+
+</script>
+
+</body>
+
+</html>
